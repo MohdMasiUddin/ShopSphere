@@ -29,7 +29,11 @@ export default function AuthModal({ onClose }: AuthModalProps) {
         : await api.login(email, password);
 
       login(data.user, data.token);
-      onClose();
+onClose();
+
+if (data.user.role === 'ADMIN') {
+  window.location.href = '/admin';
+}
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Something went wrong'
