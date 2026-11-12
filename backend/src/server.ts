@@ -24,8 +24,12 @@ const PORT = process.env.PORT || 5001;
 
 app.use(helmet());
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: [
+    "http://localhost:5173",
+    "https://shopsphere-one-azure.vercel.app",
+  ],
 }));
+
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
