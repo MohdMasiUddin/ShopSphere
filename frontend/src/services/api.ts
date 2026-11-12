@@ -141,8 +141,9 @@ export const api = {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to save shipping address');
-    }
+  console.error('Address validation errors:', data.errors);
+  throw new Error(data.message || 'Failed to save shipping address');
+}
 
     return data;
   },

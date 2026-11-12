@@ -1,15 +1,7 @@
 
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT || 587),
-  secure: process.env.SMTP_SECURE === "true",
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendOrderConfirmationEmail(
   email: string,
@@ -17,8 +9,11 @@ export async function sendOrderConfirmationEmail(
   orderNumber: string,
   total: number
 ) {
-  const info = await transporter.sendMail({
-    from: process.env.EMAIL_FROM,
+  const from =
+    process.env.EMAIL_FROM || "ShopSphere <onboarding@resend.dev>";
+
+  const { data, error } = await resend.emails.send({
+    from,
     to: email,
     subject: `ShopSphere Order Confirmed - ${orderNumber}`,
     html: `
@@ -34,7 +29,11 @@ export async function sendOrderConfirmationEmail(
       </div>
     `,
   });
-console.log("Message ID:", info.messageId);
-console.log("SMTP response:", info.response);
-console.log("Email preview:", nodemailer.getTestMessageUrl(info));
+
+  if (error) {
+    console.error("Resend email failed:", error);
+    throw new Error(error.message);
+  }
+
+  console.log("Order confirmation email sent:", data?.id);
 }
